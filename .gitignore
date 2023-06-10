@@ -1,0 +1,20 @@
+target/
+project/target/
+project/project/
+.idea/
+*.iml
+*.ipr
+*.iws
+*.class
+ # SBT
+lib_managed/
+src_managed/
+project/boot/
+project/plugins/project/
+project/plugins/target/
+dist/
+logs/
+tmp/
+
+# Config
+conf/application.conf
