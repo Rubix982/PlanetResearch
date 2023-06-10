@@ -21,7 +21,7 @@ class ParquetSparkProcessor extends IUseSparkProcessor with IBatchProcessor with
     val inputAsBytes = input.getBytes(MiscConfig.CharsetStandard)
     val compressedData = CompressionUtils.compress(inputAsBytes)
     val schema: StructType = StructType(Seq(StructField(DataFrameColumnName, BinaryType)))
-    val data: DataFrame = spark.createDataFrame(Seq((compressedData, ))
+    val data: DataFrame = spark.createDataFrame(Seq(compressedData)
       .map(Tuple1.apply))
       .toDF(DataFrameColumnName)
     val partitions: DataFrame = data.repartition(batchSize)
@@ -29,7 +29,7 @@ class ParquetSparkProcessor extends IUseSparkProcessor with IBatchProcessor with
     partitions
       .select(collect_list(col(DataFrameColumnName)).over())
       .where(s"size($DataFrameColumnName) > 0")
-      .foreachPartition { batch => {
+      .foreachPartition { batch: Iterator[Row] => {
         val seqRow: Seq[Row] = batch.toSeq
         val seqString: Seq[String] = seqRow.map(_.mkString(MiscConfig.SeqRowToStringChar))
         writeBatch(seqString, schema, outputPath)
