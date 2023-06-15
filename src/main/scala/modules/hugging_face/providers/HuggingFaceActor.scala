@@ -24,7 +24,7 @@ class HuggingFaceActor extends Actor {
   def makeHttpRequest(dataset_name: String): String = {
     val datasetName = dataset_name
     val token = HuggingFaceConfig.getHuggingFaceToken
-    val url = s"${HuggingFaceConfig.getHuggingFaceDatasetNameUrl}$datasetName"
+    val url = s"${HuggingFaceConfig.getHuggingFaceDatasetNameUrl}/$datasetName"
 
     val request = HttpRequest.newBuilder()
       .uri(URI.create(url))
