@@ -4,7 +4,7 @@ package modules.parquet
 import config.{DateConfig, FileTypes, MiscConfig}
 import interfaces.{IBatchProcessor, IUseDataFrames, IUseSparkProcessor}
 import modules.comperssor.CompressionUtils
-import modules.file_path.Path
+import modules.file_path.PlanetResearchPathUtils
 
 import org.apache.spark.TaskContext
 import org.apache.spark.rdd.RDD
@@ -41,7 +41,7 @@ class ParquetSparkProcessor extends IUseSparkProcessor with IBatchProcessor with
     val timestamp: String = LocalDateTime.now.format(DateTimeFormatter.ofPattern(DateConfig.DateFormatForFileSave))
     val partitionIndex: Int = TaskContext.getPartitionId()
     val fileName: String = s"part-$timestamp-$partitionIndex.${FileTypes.Parquet}"
-    val pathToSaveTo: String = Path.join(outputPath, fileName)
+    val pathToSaveTo: String = PlanetResearchPathUtils.join(outputPath, fileName)
     val parallelizedBatch: RDD[String] = spark.sparkContext.parallelize(batch)
     val batchDF: DataFrame = spark.createDataFrame(parallelizedBatch.asInstanceOf[RDD[Row]], schema)
     batchDF.write.mode(SaveMode.Append).parquet(pathToSaveTo)

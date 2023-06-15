@@ -3,7 +3,7 @@ package modules.hugging_face.providers
 
 import config.{HttpConfig, MiscConfig, PathsConfig}
 import interfaces.IDataHarvest
-import modules.file_path.Path
+import modules.file_path.PlanetResearchPathUtils
 import modules.hugging_face.config.HuggingFaceConfig
 import modules.parquet.ParquetSparkProcessor
 
@@ -41,8 +41,8 @@ class HuggingFaceHandler extends IDataHarvest {
     )
 
     // Create the output path
-    val outputPath: String = Path.join(
-      Path.join(PathsConfig.CurrentUserProjectPath, MiscConfig.DataFolderName),
+    val outputPath: String = PlanetResearchPathUtils.join(
+      PlanetResearchPathUtils.join(PathsConfig.CurrentUserProjectPath, MiscConfig.DataFolderName),
       HuggingFaceConfig.getHuggingFaceName)
 
     // Handle responses when they complete

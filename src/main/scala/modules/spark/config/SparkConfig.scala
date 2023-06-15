@@ -1,11 +1,9 @@
 package planetresearch
 package modules.spark.config
 
-import com.typesafe.config.{Config, ConfigFactory}
+import interfaces.IProvideTypesafeConfig
 
-object SparkConfig {
-  private val config: Config = ConfigFactory.load()
-
+object SparkConfig extends IProvideTypesafeConfig {
   def getSparkAppName: String = config.getString("planetresearch.spark.app_name")
 
   def getSparkMaster: String = config.getString("planetresearch.spark.master")

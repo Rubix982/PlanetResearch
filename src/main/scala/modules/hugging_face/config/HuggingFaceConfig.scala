@@ -1,11 +1,9 @@
 package planetresearch
 package modules.hugging_face.config
 
-import com.typesafe.config.Config
+import interfaces.IProvideTypesafeConfig
 
-object HuggingFaceConfig {
-  private val config: Config = com.typesafe.config.ConfigFactory.load()
-
+object HuggingFaceConfig extends IProvideTypesafeConfig {
   def getHuggingFaceActorName: String = "ActorSystem"
 
   def getHuggingFaceName: String = config.getString("planetresearch.hugging_face.name")
