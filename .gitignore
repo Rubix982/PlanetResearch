@@ -21,3 +21,6 @@ conf/application.conf
 
 # Bin
 bin/
+
+# Logs
+scripts/logs/
