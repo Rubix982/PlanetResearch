@@ -1,1 +1,1 @@
-source ./winutils/winutils.sh
+source $(pwd)/scripts/hadoop/winutils/winutils.sh
