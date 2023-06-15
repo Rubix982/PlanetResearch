@@ -1,0 +1,4 @@
+WINUTILS_URL=https://github.com/kontext-tech/winutils/raw/master/hadoop-3.3.1/bin/winutils.exe
+PATH_TO_WINUTILS=../../bin/winutils.exe
+LOG_DIR=../../logs
+LOG_FILE=$(date +%Y%m%d%H%M%S).log
