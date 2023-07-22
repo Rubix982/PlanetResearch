@@ -2,7 +2,7 @@
 $DebugPreference = "Continue"
 $VerbosePreference = "Continue"
 
-Import-Module -Name (Join-Path (Get-Location).Path "\scripts\helpers\logs\logging.ps1") -Force
+Import-Module -Name (Join-Path (Get-Location).Path "\scripts\helpers\logging.psm1") -Force
 
 # Greet user
 Write-TimeStampedDebugMessage "Starting winutils.ps1"
@@ -47,46 +47,25 @@ if (-not(Test-Path $config_file_path))
 $config = Get-Content $config_file_path  | ConvertFrom-StringData
 Write-TimeStampedDebugMessage "Config file loaded successfully"
 
-# Construct path to log file
-$log_dir_path = Join-Path $script_path $config.LOG_DIR
-Write-TimeStampedDebugMessage "Log directory path: $log_dir_path"
-
 # Winutils file path
 $winutils_file_path = (Join-Path $bin_dir_path $config.FILE_NAME)
 Write-TimeStampedDebugMessage "Winutils file path: $winutils_file_path"
 
-# Create log directory if it doesn't exist
-if (-not(Test-Path $log_dir_path))
-{
-    Write-TimeStampedWarningMessage "Log directory does not exist"
-    Write-TimeStampedDebugMessage "Creating log directory"
-    New-Item -ItemType Directory -Path $log_dir_path
-    Write-TimeStampedProgressMessage "Log directory created successfully"
-}
-
-# Build log file name
-$log_file_name = "$((Get-Timestamp).Replace(' ', '_').Replace(':', '-') )_hadoop.log"
-Write-TimeStampedDebugMessage "Log file name: $log_file_name"
-
-# Construct path to log file
-$log_file_path = Join-Path $log_dir_path $log_file_name
-Write-TimeStampedDebugMessage "Log file path: $log_file_path"
-
 try
 {
-    Write-TimeStampedDebugMessage "Checking if winutils.exe exists previously" | Out-File $log_file_path -Append
+    Write-TimeStampedDebugMessage "Checking if winutils.exe exists previously"
 
     # Check if the file already exists locally
     if (Test-Path $winutils_file_path)
     {
         # If it is, then log that it is, and move on
-        Write-TimeStampedDebugMessage "winutils.exe already exists locally" | Out-File $log_file_path -Append
+        Write-TimeStampedDebugMessage "winutils.exe already exists locally"
     }
     else
     {
         # Download winutils.exe from remote server
         Invoke-WebRequest -Uri $config.WINUTILS_URL -OutFile $winutils_file_path
-        Write-TimeStampedDebugMessage "Downloaded winutils.exe from $( $config.WINUTILS_URL )" | Out-File $log_file_path -Append
+        Write-TimeStampedDebugMessage "Downloaded winutils.exe from $( $config.WINUTILS_URL )"
     }
 
     $envVariables = @(
@@ -97,25 +76,25 @@ try
     foreach ($envVariable in $envVariables)
     {
         # Delete environment variable if it exists
-        Write-TimeStampedDebugMessage "Checking if $envVariable exists previously" | Out-File $log_file_path -Append
+        Write-TimeStampedDebugMessage "Checking if $envVariable exists previously"
 
         if ( [Environment]::GetEnvironmentVariable($envVariable, "User"))
         {
-            Write-TimeStampedDebugMessage "Deleting $envVariable" | Out-File $log_file_path -Append
+            Write-TimeStampedDebugMessage "Deleting $envVariable"
             [Environment]::SetEnvironmentVariable($envVariable, $null, "User")
         }
 
         # Set environment variable
         [Environment]::SetEnvironmentVariable($envVariable, $bin_dir_path, "User")
-        Write-TimeStampedDebugMessage "Set $envVariable to $( $bin_dir_path )" | Out-File $log_file_path -Append
+        Write-TimeStampedDebugMessage "Set $envVariable to $( $bin_dir_path )"
     }
 
     # Add directory to PATH environment variable
     [Environment]::SetEnvironmentVariable("PATH", "$( $winutils_file_path ); $( $env:PATH )", "User")
-    Write-TimeStampedDebugMessage "Added $( $winutils_file_path ) to PATH environment variable" | Out-File $log_file_path -Append
+    Write-TimeStampedDebugMessage "Added $( $winutils_file_path ) to PATH environment variable"
 
     # Log that the script has finished
-    Write-TimeStampedDebugMessage "Finished winutils.ps1" | Out-File $log_file_path -Append
+    Write-TimeStampedDebugMessage "Finished winutils.ps1"
 
     # Log success message
     Write-Verbose "The operation completed successfully"
@@ -123,5 +102,5 @@ try
 catch
 {
     # Log a possible exception that could happen
-    Write-Error "$( Get-Timestamp ) - ERROR: $( $_.Exception.Message )" | Out-File $log_file_path -Append
+    Write-TimeStampedErrorMessage "ERROR: $( $_.Exception.Message )"
 }
