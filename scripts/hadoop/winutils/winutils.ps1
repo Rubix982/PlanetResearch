@@ -8,6 +8,24 @@ function Get-Timestamp
     return "$( Get-Date -Format 'yyyy-MM-dd HH:mm:ss' )"
 }
 
+# Define function to write progess messages with timestamp
+function Write-TimeStampedProgressMessage($message)
+{
+    Write-Progress -Activity "winutils.ps1" -Status $message
+}
+
+# Define function to write warning messages with timestamp
+function Write-TimeStampedWarningMessage($message)
+{
+    Write-Warning "$( Get-Timestamp ) - $message"
+}
+
+# Define function to write error messages with timestamp
+function Write-TimeStampedErrorMessage($message)
+{
+    Write-Error "$( Get-Timestamp ) - $message"
+}
+
 # Define function to write debug messages with timestamp
 function Write-TimeStampedDebugMessage($message)
 {
@@ -25,6 +43,15 @@ Write-TimeStampedDebugMessage "Script path: $script_path"
 $bin_dir_path = (Join-Path (Get-Location).Path "bin")
 Write-TimeStampedDebugMessage "Bin directory path: $bin_dir_path"
 
+# Create bin directory if it doesn't exist
+if (-not(Test-Path $bin_dir_path))
+{
+    Write-TimeStampedWarningMessage "Bin directory does not exist"
+    Write-TimeStampedDebugMessage "Creating bin directory"
+    New-Item -ItemType Directory -Path $bin_dir_path
+    Write-TimeStampedProgressMessage "Bin directory created successfully"
+}
+
 # Specify project-script path
 $project_script_path = (Join-Path $script_path "hadoop")
 Write-TimeStampedDebugMessage "Project script path: $project_script_path"
@@ -40,7 +67,7 @@ Write-TimeStampedDebugMessage "Config file path: $config_file_path"
 # Verify that the config file exists
 if (-not(Test-Path $config_file_path))
 {
-    Write-Error "$( Get-Timestamp ) - ERROR: config.txt file not found"
+    Write-TimeStampedErrorMessage "ERROR: config.txt file not found"
     exit 1
 }
 
@@ -59,8 +86,10 @@ Write-TimeStampedDebugMessage "Winutils file path: $winutils_file_path"
 # Create log directory if it doesn't exist
 if (-not(Test-Path $log_dir_path))
 {
+    Write-TimeStampedWarningMessage "Log directory does not exist"
     Write-TimeStampedDebugMessage "Creating log directory"
     New-Item -ItemType Directory -Path $log_dir_path
+    Write-TimeStampedProgressMessage "Log directory created successfully"
 }
 
 # Build log file name
