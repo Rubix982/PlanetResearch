@@ -102,6 +102,8 @@ Write-TimeStampedDebugMessage "Log file path: $log_file_path"
 
 try
 {
+    Write-TimeStampedDebugMessage "Checking if winutils.exe exists previously" | Out-File $log_file_path -Append
+
     # Check if the file already exists locally
     if (Test-Path $winutils_file_path)
     {
@@ -115,9 +117,26 @@ try
         Write-TimeStampedDebugMessage "Downloaded winutils.exe from $( $config.WINUTILS_URL )" | Out-File $log_file_path -Append
     }
 
-    # Set HADOOP_HOME environment variable
-    [Environment]::SetEnvironmentVariable("HADOOP_HOME", $winutils_file_path, "User")
-    Write-TimeStampedDebugMessage "Set HADOOP_HOME to $( $winutils_file_path )" | Out-File $log_file_path -Append
+    $envVariables = @(
+    "HADOOP_HOME",
+    "HADOOP_HOME_DIR"
+    )
+
+    foreach ($envVariable in $envVariables)
+    {
+        # Delete environment variable if it exists
+        Write-TimeStampedDebugMessage "Checking if $envVariable exists previously" | Out-File $log_file_path -Append
+
+        if ( [Environment]::GetEnvironmentVariable($envVariable, "User"))
+        {
+            Write-TimeStampedDebugMessage "Deleting $envVariable" | Out-File $log_file_path -Append
+            [Environment]::SetEnvironmentVariable($envVariable, $null, "User")
+        }
+
+        # Set environment variable
+        [Environment]::SetEnvironmentVariable($envVariable, $bin_dir_path, "User")
+        Write-TimeStampedDebugMessage "Set $envVariable to $( $bin_dir_path )" | Out-File $log_file_path -Append
+    }
 
     # Add directory to PATH environment variable
     [Environment]::SetEnvironmentVariable("PATH", "$( $winutils_file_path ); $( $env:PATH )", "User")
