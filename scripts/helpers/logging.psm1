@@ -52,6 +52,13 @@ function Write-TimeStampedDebugMessage($message)
     Write-Log $formatted_message
 }
 
+function Write-TimeStampedHostMessage($message)
+{
+    $formatted_message = "$( Get-Timestamp ) - [HOST]:: $message"
+    Write-Host $formatted_message
+    Write-Log $formatted_message
+}
+
 # Define an enum for log message types
 enum LogMessageType
 {
@@ -59,6 +66,7 @@ enum LogMessageType
     Warning
     Error
     Debug
+    Host
 }
 
 # Define function to write progress messages with timestamp
@@ -81,6 +89,10 @@ function LogMessageTypePaths
         elseif ($LOG_PATHS[$log_path] -eq [LogMessageType]::Debug)
         {
             Write-TimeStampedDebugMessage $log_path
+        }
+        elseif ($LOG_PATHS[$log_path] -eq [LogMessageType]::Host)
+        {
+            Write-TimeStampedHostMessage $log_path
         }
     }
 }
@@ -120,4 +132,4 @@ $obtained_log_file_path = Get-LogFilePath
 
 LogMessageTypePaths
 
-Export-ModuleMember -Function Get-Timestamp, Write-TimeStampedProgressMessage, Write-TimeStampedWarningMessage, Write-TimeStampedErrorMessage, Write-TimeStampedDebugMessage
+Export-ModuleMember -Function Get-Timestamp, Write-TimeStampedProgressMessage, Write-TimeStampedWarningMessage, Write-TimeStampedErrorMessage, Write-TimeStampedDebugMessage, Write-TimeStampedHostMessage
